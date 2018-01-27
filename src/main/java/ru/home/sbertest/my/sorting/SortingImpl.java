@@ -9,8 +9,10 @@ public class SortingImpl implements Sorting {
         SortEnum sort = SortEnum.valueOf(sortDirection);
         if (null == sort || sort == SortEnum.ASC) {
             Collections.sort(collection);
+            System.out.println(String.format("Сортировка элементов по возрастанию"));
         } else if (sort == SortEnum.DESC) {
             collection.sort(Collections.reverseOrder());
+            System.out.println(String.format("Сортировка элементов по убыванию"));
         }
     }
 }

@@ -11,25 +11,25 @@ import java.util.stream.Collectors;
 public class TxtFile implements IWorkFile {
 
     @Override
-    public void load(File file, String delimiter, List list) {
+    public void load(File file, String delimiter, List list) throws FileOperationException {
         FileReader reader;
-        try{
+        try {
             reader = new FileReader(file);
             int c;
             StringBuilder s = new StringBuilder();
-            while((c=reader.read())!=-1){
+            while ((c = reader.read()) != -1) {
                 s.append((char) c);
             }
             list.addAll(Arrays.stream(s.toString().split(delimiter)).map(Integer::valueOf).collect(Collectors.toList()));
         } catch (IOException e) {
-            System.out.println("Ошибка загрузки файла!");
-        }catch (NumberFormatException nfe){
-            System.out.println("Ошибка загрузки данных, не верно указан раздилитель!");
+            throw new FileOperationException("Ошибка загрузки файла!");
+        } catch (NumberFormatException nfe) {
+            throw new FileOperationException("Ошибка загрузки данных, не верно указан раздилитель!");
         }
     }
 
     @Override
-    public void save(File file, String data, String delimiter) {
+    public void save(File file, String data, String delimiter) throws FileOperationException{
         FileWriter writer;
         try {
             writer = new FileWriter(file);
@@ -37,7 +37,7 @@ public class TxtFile implements IWorkFile {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            System.out.println("Ошибка сохранения в файл!");
+            throw new FileOperationException("Ошибка сохранения в файл!");
         }
     }
 
