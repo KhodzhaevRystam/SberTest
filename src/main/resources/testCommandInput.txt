@@ -2,5 +2,12 @@ add 5
 add 8
 add 9
 add 0
+sort desc
 add 3
+add 3
+list
+set 2 4
+sort
 list ;
+save 1.txt
+get 2

@@ -1,21 +1,28 @@
 package ru.home.sbertest.my;
 
 
+import org.reflections.Reflections;
 import ru.home.sbertest.my.files.TxtFile;
 import ru.home.sbertest.my.other.Command;
-import ru.home.sbertest.my.repo.Repository;
+import ru.home.sbertest.my.other.Commands;
+import ru.home.sbertest.my.other.Null;
 import ru.home.sbertest.my.util.Delimiter;
+import ru.home.sbertest.my.util.FileUtil;
 
+import javax.rmi.CORBA.Util;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.lang.reflect.Parameter;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class ScannerInput {
 
-    private Repository repository;
+    private List<Method> repository;
+    private Map<String, Object> clases;
 
     public void run() {
         init();
@@ -28,8 +35,17 @@ public class ScannerInput {
     }
 
     private void init() {
-        repository = new Repository();
-        repository.setFileType(new TxtFile());
+        try {
+            repository = new ArrayList<>();
+            Set<Class<?>> set = new Reflections("ru.home.sbertest.my.repo").getTypesAnnotatedWith(Commands.class);
+            clases = new HashMap<>();
+            for (Class c : set) {
+                clases.put(c.getName(), c.newInstance());
+                repository.addAll(Arrays.asList(c.getDeclaredMethods()));
+            }
+        }catch (Exception e) {
+            throw new RuntimeException("Ошибка подгрузки команд!");
+        }
     }
 
     private void scannFile(File file) {
@@ -77,20 +93,19 @@ public class ScannerInput {
                 //если без указания пути к файлу
                 file = new File(defpath + Delimiter.get((String) args[0]));
             }
-            args[0] = file;
+            args[0] = file.getAbsolutePath();
             invokeCommand(command, args);
         }
         return f;
     }
 
     private Method invokeCommand(String command, Object... args) {
-        Class<?> c = repository.getClass();
-        for (Method m : c.getMethods()) {
+        for (Method m : repository) {
             Command annotation = m.getAnnotation(Command.class);
             if (annotation != null && annotation.value().equalsIgnoreCase(command)
-                    && m.getParameterCount() == args.length) {
+                    && m.getParameterCount() == (args = castParamToMethod(m, args)).length) {
                 try {
-                    m.invoke(repository, castParamToMethod(m, args));
+                    m.invoke(clases.get(m.getDeclaringClass().getName()), args);
                     return m;
                 } catch (Exception e) {
                     System.out.println("Ошибка вызова команды");
@@ -104,12 +119,24 @@ public class ScannerInput {
 
     private Object[] castParamToMethod(Method method, Object... args) {
         int i = 0;
-        for (Class clazz : method.getParameterTypes()) {
-            if (clazz == Integer.class) {
-                args[i] = Integer.valueOf((String) args[i++]);
+        int j = 0;
+        int countParams = method.getParameterCount();
+        Object[] mas = new Object[countParams];
+        for (Parameter p : method.getParameters()) {
+            if (p.getAnnotation(Null.class) == null) {
+                if (Integer.class == p.getType()) {
+                    mas[i++] = Integer.valueOf((String) args[j++]);
+                } else {
+                    mas[i++] = args[j++];
+                }
+            } else if(p.getAnnotation(Null.class) != null && countParams > args.length){
+                mas[i++] = null;
+
+            }else if(p.getAnnotation(Null.class) != null && countParams == args.length){
+                mas[i++] = args[j++];
             }
         }
-        return args;
+        return mas;
     }
 
 }
