@@ -7,13 +7,24 @@
     <groupId>ru.home</groupId>
     <artifactId>sber-test</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>plugin-core</module>
+        <module>first-plugin</module>
+        <module>sbertest-core</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.10</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

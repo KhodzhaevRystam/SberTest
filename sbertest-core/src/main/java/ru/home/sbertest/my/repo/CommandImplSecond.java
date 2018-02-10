@@ -9,14 +9,14 @@ import ru.home.sbertest.my.sorting.Sorting;
 import ru.home.sbertest.my.sorting.SortingImpl;
 import ru.home.sbertest.my.util.Delimiter;
 import ru.home.sbertest.my.util.FileUtil;
+import ru.home.sbertest.plugin.IRepo;
 
 import java.util.stream.Collectors;
 
 @Commands
-public class CommandImplSecond extends Repo{
+public class CommandImplSecond implements IRepo {
 
-
-    @Command("save to html")
+    @Command("save_html")
     public void save(String file, @Null String delimiter) {
         try {
             String data = String.join(Delimiter.get(delimiter),

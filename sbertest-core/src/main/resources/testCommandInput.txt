@@ -1,8 +1,15 @@
 add 5
+add x
 add 8
+add 13
 add 9
+del 1
+list
+add 2
 add 0
+find x
 sort desc
+list
 add 3
 add 3
 list
@@ -10,4 +17,7 @@ set 2 4
 sort
 list ;
 save 1.txt
+save_html 1.html
+UNIQUE
+list
 get 2
