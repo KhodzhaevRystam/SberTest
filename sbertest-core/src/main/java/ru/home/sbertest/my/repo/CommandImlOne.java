@@ -2,11 +2,12 @@ package ru.home.sbertest.my.repo;
 
 import ru.home.sbertest.my.files.FileOperationException;
 import ru.home.sbertest.my.files.TxtFile;
-import ru.home.sbertest.my.other.Command;
-import ru.home.sbertest.my.other.Commands;
-import ru.home.sbertest.my.other.Null;
+
 import ru.home.sbertest.my.util.Delimiter;
 import ru.home.sbertest.my.util.FileUtil;
+import ru.home.sbertest.other.Command;
+import ru.home.sbertest.other.Commands;
+import ru.home.sbertest.other.Null;
 import ru.home.sbertest.plugin.IRepo;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class CommandImlOne implements IRepo {
     @Command("del")
     public void del(Integer index) {
         if (index != null) {
-            repo.remove((int)index);
+            repo.remove((int) index);
             System.out.println(String.format("Удалили значение по индексу %d", index));
         }
     }

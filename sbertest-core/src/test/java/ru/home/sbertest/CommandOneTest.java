@@ -11,7 +11,7 @@ import java.util.List;
 public class CommandOneTest {
 
     @BeforeClass
-    public void before(){
+    public static void before(){
         IRepo.repo.clear();
     }
 
@@ -23,8 +23,17 @@ public class CommandOneTest {
         Assert.assertTrue(repo.get(0) == 5);
         scannerInput.process("add 15");
         scannerInput.process("add 25");
+        scannerInput.process("del 1");
         scannerInput.process("add 35");
         scannerInput.process("add 45");
+        Assert.assertTrue(repo.get(3) == 45);
+        scannerInput.process("list");
+    }
+
+    @Test
+    public void test2() {
+        ScannerInput scannerInput = new ScannerInput();
+        scannerInput.process("save out/123.txt");
         scannerInput.process("list");
     }
 }

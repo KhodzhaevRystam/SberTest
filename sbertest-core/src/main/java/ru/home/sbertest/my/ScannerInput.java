@@ -2,46 +2,56 @@ package ru.home.sbertest.my;
 
 
 import org.reflections.Reflections;
-import ru.home.sbertest.my.files.TxtFile;
-import ru.home.sbertest.my.other.Command;
-import ru.home.sbertest.my.other.Commands;
-import ru.home.sbertest.my.other.Null;
 import ru.home.sbertest.my.util.Delimiter;
-import ru.home.sbertest.my.util.FileUtil;
+import ru.home.sbertest.other.Command;
+import ru.home.sbertest.other.Commands;
+import ru.home.sbertest.other.Null;
 
-import javax.rmi.CORBA.Util;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 public class ScannerInput {
 
     private List<Method> repository;
     private Map<String, Object> clases;
+    private PluginLoader pluginLoader;
 
     public ScannerInput() {
         init();
+        pluginLoader = new PluginLoader(this);
     }
 
     public void run() {
         init();
+        new Thread(pluginLoader).start();
         scanner();
     }
 
     public void run(String... args) {
         init();
+        pluginLoader.run();
         scannFile(new File(args[0]));
+    }
+
+    public void intiPlugin(){
+        repository = new ArrayList<>();
+        try {
+            for (Object o : clases.values()) {
+                repository.addAll(Arrays.asList(o.getClass().getDeclaredMethods()));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка подгрузки команд!");
+        }
+        int a = 2;
     }
 
     private void init() {
         try {
             repository = new ArrayList<>();
-            Set<Class<?>> set = new Reflections("ru.home.sbertest.my.repo").getTypesAnnotatedWith(Commands.class);
+            Set<Class<?>> set = new Reflections("ru.home.sbertest.my.repo")
+                    .getTypesAnnotatedWith(Commands.class);
             clases = new HashMap<>();
             for (Class c : set) {
                 clases.put(c.getName(), c.newInstance());
@@ -118,6 +128,7 @@ public class ScannerInput {
         }
         System.out.println("Комманда не поддерживается!!!");
         return null;
+
     }
 
     private Object[] castParamToMethod(Method method, Object... args) {
@@ -151,4 +162,11 @@ public class ScannerInput {
         }
     }
 
+    public List<Method> getRepository() {
+        return repository;
+    }
+
+    public Map<String, Object> getClases() {
+        return clases;
+    }
 }
